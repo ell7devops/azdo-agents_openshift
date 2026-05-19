@@ -81,7 +81,7 @@ print_header "3. Configuring Azure Pipelines agent..."
 
 print_header "4. Running Azure Pipelines agent..."
 
-if ! grep -q "azdo-template" <<< "$AZP_AGENT_NAME"; then
+if ! grep -q "agents-template" <<< "$AZP_AGENT_NAME"; then
   echo "Cleanup Traps Enabled"
   trap 'cleanup; exit 0' EXIT
   trap 'cleanup; exit 130' INT

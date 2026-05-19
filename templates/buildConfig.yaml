@@ -1,0 +1,36 @@
+{{- if .Values.image.buildConfig.enabled }}
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.image.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  nodeSelector: {}
+  completionDeadlineSeconds: 1200
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.image.name }}:{{ .Values.image.tag}}
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: "git@ssh.dev.azure.com:v3/<azdo-org>/<azdo-project>/<actual-repo>"
+    sourceSecret:
+      name: {{ .Values.sourceSecret.name }}
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+    - type: ConfigChange
+  resources:
+    limits:
+      cpu: '1'
+      memory: 1Gi
+    requests:
+      cpu: '1'
+      memory: 1Gi
+{{- end }}

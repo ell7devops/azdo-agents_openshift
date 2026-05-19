@@ -1,0 +1,35 @@
+namespace: <namespace> # customize
+
+global:
+  labels:
+    app: azdo-agent
+
+sourceSecret:
+  name : <git-ssh-key> # customize
+
+image:
+  buildConfig:
+    enabled: true
+  name: <image-name> # customize
+  tag: 1.0
+  registry: image-registry.openshift-image-registry.svc:5000 #internal registry
+  pullPolicy: Always
+  imagePullSecrets: []
+
+resources:
+  limits:
+    cpu: "1"
+    memory: "1400Mi"
+  requests:
+    cpu: "100m"
+    memory: "400Mi"
+
+secret:
+  name: "azdo-secret"
+
+serviceAccount:
+  create: true
+  name : "azdo-agent-sa"
+
+azdo:
+  poolName: "<azdo-pool-name>" # customize

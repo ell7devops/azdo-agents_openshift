@@ -1,0 +1,5 @@
+apiVersion: v2
+name: azdo-agent-aro
+description: A Helm chart to deploy Azure Pipelines Agent in ARO
+version: 0.1.0
+appVersion: "1.0"

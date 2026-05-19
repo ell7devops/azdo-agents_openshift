@@ -1,0 +1,65 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: {{ .Values.image.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  jobTargetRef:
+    template:
+      spec:
+        {{- with .Values.image.imagePullSecrets }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 1001
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+          image: "{{ .Values.image.registry }}/{{ .Values.namespace }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: AZP_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secret.name }}
+                key: AZP_URL
+          - name: AZP_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secret.name }}
+                key: AZP_TOKEN
+          - name: AZP_POOL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secret.name }}
+                key: AZP_POOL
+          volumeMounts:
+          - mountPath: /var/lib/containers
+            name: varlibcontainers
+        volumes:
+        - name: varlibcontainers
+          emptyDir: {}
+        restartPolicy: Never
+        serviceAccountName: {{ .Values.serviceAccount.name }}
+        activeDeadlineSeconds: 10800
+  pollingInterval: 10
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 3
+  maxReplicaCount: 4
+  scalingStrategy:
+    strategy: "default"
+  triggers:
+  - type: azure-pipelines
+    metadata:
+      poolName: {{ .Values.azdo.poolName | quote }}
+      organizationURLFromEnv: "AZP_URL"
+    authenticationRef:
+      name: {{ .Values.image.name }}

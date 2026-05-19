@@ -232,7 +232,7 @@ When the SSH key in AzDO is near expiration:
 <a id="prerequisites"></a>
 
 ## ▶ Prerequisites
-- The Agent Pool in AzDO is already in place.
+- The Agent Pool (type: `self-hosted`) in AzDO is already in place.
 - The PAT & SSH key are defined in AzDO & implemented as secrets in ARO.
 - KEDA operator is already installed in ARO.
 
